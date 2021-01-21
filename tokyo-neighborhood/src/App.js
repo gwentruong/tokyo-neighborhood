@@ -1,9 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, Fragment } from 'react';
 import mapboxgl from "mapbox-gl";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import * as turf from '@turf/turf';
 import axios from 'axios';
 import osmtogeojson from 'osmtogeojson';
+import InfoOverview from './InfoOverview';
 
 import './App.css';
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -22,21 +23,35 @@ const App = () => {
   const mapContainer = useRef(null);
   const [selectedBbox, setSelectedBbox] = useState(null);
   const [OSMData, setOSMData] = useState(null);
+  const [overview, setOverview] = useState({})
 
   mapboxgl.accessToken = 'pk.eyJ1IjoidXllbnRydW9uZyIsImEiOiJjanVjcGN0b3IwaG5xNDNwZHJ3czRlNmJhIn0.u7o0VUuXY5f-rs4hcrwihA';
 
   const processOSMdata = () => {
     if (OSMData) {
-      console.log(OSMData, selectedBbox)
-      console.log('tt', turf.bboxPolygon(selectedBbox))
-      let landuseArea = turf.area(turf.bboxPolygon(selectedBbox));
-      console.log('landuseArea', landuseArea)
+      if (OSMData.features[0].id.includes('way')) {
+        console.log(OSMData, selectedBbox)
+        console.log('tt', turf.bboxPolygon(selectedBbox))
+        let landuseArea = Math.round(turf.area(turf.bboxPolygon(selectedBbox)) * 100)/ 100;
+        console.log('landuseArea', landuseArea)
 
-      let totalBuildings = OSMData.features.length
-      let buildingAreas = OSMData.features.map(building => turf.area(building))
-      let sumBuildingAreas = buildingAreas.reduce((a,b) => a + b, 0)
-      let fractionArea = Math.round(sumBuildingAreas / landuseArea, 3)
-      console.log('count', totalBuildings, 'sum', sumBuildingAreas, 'frac', fractionArea)
+        let totalBuildings = OSMData.features.length
+        let buildingArea = OSMData.features.map(building => turf.area(building))
+        let sumBuildingArea = Math.round(buildingArea.reduce((a,b) => a + b, 0) * 100) / 100;
+        let avgBuildingArea = Math.round(sumBuildingArea * 100 /totalBuildings) / 100;
+        let fractionArea = Math.round(sumBuildingArea * 100/ landuseArea) / 100;
+        console.log('count', totalBuildings, 'sum', sumBuildingArea, 'frac', fractionArea)
+        
+        setOverview({
+          totalBuildings: totalBuildings,
+          avgBuildingArea: avgBuildingArea,
+          sumBuildingArea: sumBuildingArea,
+          landuseArea: landuseArea,
+          fractionArea: fractionArea
+        })
+      } else {
+        console.log('node', OSMData)
+      }     
     } 
   }
 
@@ -48,6 +63,7 @@ const App = () => {
 
     axios.get(url + '?data=' + dataReq)
       .then(res => {
+        console.log('dataReq', dataReq)
         setOSMData(osmtogeojson(res.data))
       },
       err => {
@@ -99,7 +115,7 @@ const App = () => {
         let bbox = turf.bbox(plg)
         setSelectedBbox(bbox)
         fetchOSM('building', bbox);
-
+        fetchOSM('amenity', bbox);
       })
     });
   };
@@ -109,9 +125,22 @@ const App = () => {
   }, [map]);
 
   useEffect(() => {
-    processOSMdata()
+    OSMData && OSMData.features && processOSMdata()
   }, [OSMData]);
-  return <div ref={el => (mapContainer.current = el)} style={styles} />;
+  return (
+    <Fragment>
+      <div ref={el => (mapContainer.current = el)} style={styles} />;
+      <div className="overlay" style={{margin:2, top: 5,  background: "#fff", height: "100%", position: "absolute"}} >
+        <div className="overlay-col sidebar" style={{padding: "10px"}}>
+          <div className="overlay-content" style={{height: "100%"}}>
+            <h2>Area overview</h2>
+            {overview ? <InfoOverview data={overview} /> : null}
+          </div>
+        </div>
+      </div>
+    </Fragment>
+  )
+    
 };
 
 export default App;
