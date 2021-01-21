@@ -98,7 +98,6 @@ const App = () => {
 
     axios.get(url + '?data=' + dataReq)
       .then(res => {
-        console.log('dataReq', dataReq)
         setOSMData(osmtogeojson(res.data))
       },
       err => {
