@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect, Fragment } from 'react';
+import { Doughnut } from '@reactchartjs/react-chart.js';
 import mapboxgl from "mapbox-gl";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import * as turf from '@turf/turf';
 import axios from 'axios';
 import osmtogeojson from 'osmtogeojson';
 import InfoOverview from './components/InfoOverview';
-import Chart from './components/Chart';
 
 import './App.css';
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -19,6 +19,8 @@ const styles = {
   position: "absolute"
 };
 
+const colorPallette = ["#54478c","#2c699a","#048ba8","#0db39e","#16db93","#83e377","#b9e769","#efea5a","#f1c453","#f29e4c"]
+
 const App = () => {
   const [map, setMap] = useState(null);
   const mapContainer = useRef(null);
@@ -26,8 +28,28 @@ const App = () => {
   const [OSMData, setOSMData] = useState(null);
   const [overview, setOverview] = useState({})
   const [amenityFeat, setAmenityFeat] = useState([]);
+  const [chartData, setChartData] = useState({});
+  const doughnut = useRef();
 
   mapboxgl.accessToken = 'pk.eyJ1IjoidXllbnRydW9uZyIsImEiOiJjanVjcGN0b3IwaG5xNDNwZHJ3czRlNmJhIn0.u7o0VUuXY5f-rs4hcrwihA';
+
+  const extractFeatures = (features) => {
+    let labels = Object.keys(features);
+    let values = labels.map(l => features[l]);
+    let colors = colorPallette.slice(0, labels.length)
+
+    const data = {
+        labels: labels,
+        datasets: [
+            {
+                label: 'Amenities',
+                data: values,
+                backgroundColor: colors
+            },
+        ],
+    }
+    setChartData(data);
+}
 
   const processOSMdata = () => {
     if (OSMData) {
@@ -135,6 +157,10 @@ const App = () => {
   }, [map]);
 
   useEffect(() => {
+    amenityFeat && extractFeatures(amenityFeat);
+  }, [amenityFeat]);
+
+  useEffect(() => {
     OSMData && OSMData.features && processOSMdata()
   }, [OSMData]);
   return (
@@ -142,11 +168,16 @@ const App = () => {
       <div ref={el => (mapContainer.current = el)} style={styles} />;
       <div className="overlay" style={{margin:2, top: 5,  background: "#fff", height: "100%", position: "absolute"}} >
         <div className="overlay-col sidebar" style={{padding: "10px"}}>
-          <div className="overlay-content" style={{height: "100%"}}>
+          <div className="overlay-content" style={{height: "100%", width: "100%"}}>
             <h2>Area overview</h2>
             {overview ? <InfoOverview data={overview} /> : null}
             <h2>Amenties</h2>
-            {amenityFeat ? <Chart features={amenityFeat} /> : null}
+            {amenityFeat 
+              ? <div><Doughnut 
+                        ref={el => doughnut.current = el} 
+                        data={chartData} 
+                        options={{ maintainAspectRatio: false }}/></div>
+              : null}
           </div>
         </div>
       </div>
