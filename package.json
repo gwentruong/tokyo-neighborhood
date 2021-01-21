@@ -2,7 +2,7 @@
   "name": "tokyo-neighborhood",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://gwentruong.github.io/tokyo-neighborhood/",
+  "homepage": "https://gwentruong.github.io/tokyo-neighborhood",
   "dependencies": {
     "@mapbox/mapbox-gl-draw": "^1.2.0",
     "@reactchartjs/react-chart.js": "^1.0.0-rc.3",
