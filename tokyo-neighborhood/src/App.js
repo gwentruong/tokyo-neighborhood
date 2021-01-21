@@ -4,7 +4,8 @@ import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import * as turf from '@turf/turf';
 import axios from 'axios';
 import osmtogeojson from 'osmtogeojson';
-import InfoOverview from './InfoOverview';
+import InfoOverview from './components/InfoOverview';
+import Chart from './components/Chart';
 
 import './App.css';
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -24,23 +25,19 @@ const App = () => {
   const [selectedBbox, setSelectedBbox] = useState(null);
   const [OSMData, setOSMData] = useState(null);
   const [overview, setOverview] = useState({})
+  const [amenityFeat, setAmenityFeat] = useState([]);
 
   mapboxgl.accessToken = 'pk.eyJ1IjoidXllbnRydW9uZyIsImEiOiJjanVjcGN0b3IwaG5xNDNwZHJ3czRlNmJhIn0.u7o0VUuXY5f-rs4hcrwihA';
 
   const processOSMdata = () => {
     if (OSMData) {
       if (OSMData.features[0].id.includes('way')) {
-        console.log(OSMData, selectedBbox)
-        console.log('tt', turf.bboxPolygon(selectedBbox))
         let landuseArea = Math.round(turf.area(turf.bboxPolygon(selectedBbox)) * 100)/ 100;
-        console.log('landuseArea', landuseArea)
-
         let totalBuildings = OSMData.features.length
         let buildingArea = OSMData.features.map(building => turf.area(building))
         let sumBuildingArea = Math.round(buildingArea.reduce((a,b) => a + b, 0) * 100) / 100;
         let avgBuildingArea = Math.round(sumBuildingArea * 100 /totalBuildings) / 100;
         let fractionArea = Math.round(sumBuildingArea * 100/ landuseArea) / 100;
-        console.log('count', totalBuildings, 'sum', sumBuildingArea, 'frac', fractionArea)
         
         setOverview({
           totalBuildings: totalBuildings,
@@ -51,6 +48,19 @@ const App = () => {
         })
       } else {
         console.log('node', OSMData)
+        let features = OSMData.features;
+        let keys = [];
+        let amenities = {};
+        features.forEach(f => {
+          let amenity = f.properties.amenity;
+          if (!keys.includes(amenity)) {
+            keys.push(amenity);
+            amenities[amenity] = 1;
+          } else {
+            amenities[amenity] += 1;
+          }
+        });
+        setAmenityFeat(amenities);
       }     
     } 
   }
@@ -135,6 +145,8 @@ const App = () => {
           <div className="overlay-content" style={{height: "100%"}}>
             <h2>Area overview</h2>
             {overview ? <InfoOverview data={overview} /> : null}
+            <h2>Amenties</h2>
+            {amenityFeat ? <Chart features={amenityFeat} /> : null}
           </div>
         </div>
       </div>
