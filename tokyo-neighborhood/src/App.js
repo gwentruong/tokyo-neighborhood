@@ -209,6 +209,7 @@ const App = () => {
     !map && initializeMap({ setMap, mapContainer });
   }, [map]);
 
+
   useEffect(() => {
     amenityFeat && extractFeatures(amenityFeat);
   }, [amenityFeat]);
@@ -219,16 +220,18 @@ const App = () => {
   return (
     <Fragment>
       <div ref={el => (mapContainer.current = el)} style={styles} />;
-      <div className="overlay" style={{margin:2, top: 5,  background: "#fff", height: "100%", position: "absolute"}} >
+      <div className="overlay" style={{margin:2, top: 5,  background: "#fff", height: "100%",  position: "absolute"}} >
         <div className="overlay-col sidebar" style={{padding: "10px"}}>
           <div className="overlay-content" style={{height: "100%", width: "100%"}}>
             <h2>Area overview</h2>
             {overview ? <InfoOverview data={overview} /> : null}
             <h2>Amenties</h2>
             {amenityFeat 
-              ? <div><Doughnut 
+              ? <div styles={{width: "500px"}}><Doughnut 
                         ref={el => doughnut.current = el} 
                         data={chartData} 
+                        width={200}
+                        height={400}
                         options={{ maintainAspectRatio: false }}/></div>
               : null}
           </div>
