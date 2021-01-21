@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, Fragment } from 'react';
+import ReactDOM from 'react-dom';
 import { Doughnut } from '@reactchartjs/react-chart.js';
 import mapboxgl from "mapbox-gl";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
@@ -61,6 +62,9 @@ const App = () => {
         let avgBuildingArea = Math.round(sumBuildingArea * 100 /totalBuildings) / 100;
         let fractionArea = Math.round(sumBuildingArea * 100/ landuseArea) / 100;
         
+        if (map) {
+          map.getSource('buildings').setData(OSMData)
+        }
         setOverview({
           totalBuildings: totalBuildings,
           avgBuildingArea: avgBuildingArea,
@@ -69,7 +73,6 @@ const App = () => {
           fractionArea: fractionArea
         })
       } else {
-        console.log('node', OSMData)
         let features = OSMData.features;
         let keys = [];
         let amenities = {};
@@ -140,6 +143,32 @@ const App = () => {
       setMap(map);
       map.resize();
 
+      // Add buildings source and layers
+      map.addSource('buildings', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: []
+        },
+        generateId: true
+      })
+
+      map.addLayer({
+        id: 'buildings-fill',
+        type: 'fill',
+        source: 'buildings',
+        paint: {
+          "fill-color": '#b2c3ae',
+          "fill-outline-color": '#000',
+          "fill-opacity": 0.5
+        }
+      });
+
+      let buildingPopup = new mapboxgl.Popup({
+        closeOnMove: true,
+        closeOnClick: true
+      });
+
       // Event when polygon created
       map.on('draw.create', e => {
         let plg = e.features[0];
@@ -148,6 +177,30 @@ const App = () => {
         setSelectedBbox(bbox)
         fetchOSM('building', bbox);
         fetchOSM('amenity', bbox);
+      })
+
+      map.on('click', 'buildings-fill', e => {
+        let props = e.features[0].properties
+        let keys = Object.keys(props)
+
+        let buildingInfoComponent = <table>
+          <tbody>
+            {keys.map((key, index) => 
+              <tr key={index}>
+                <th>{key}</th>
+                <td>{props[key]}</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+
+        var div = document.createElement("div", "popup")
+        ReactDOM.render(buildingInfoComponent, div)
+
+        buildingPopup
+            .setLngLat(e.lngLat)
+            .setDOMContent(div)
+            .addTo(map);
       })
     });
   };
