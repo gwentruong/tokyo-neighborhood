@@ -1,3 +1,6 @@
+// Author: Uyen Truong, 2021
+// Contact: haiuyentruong@gmail.com
+
 import React, { useState, useRef, useEffect, Fragment } from 'react';
 import ReactDOM from 'react-dom';
 import { Doughnut } from '@reactchartjs/react-chart.js';

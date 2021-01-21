@@ -1,70 +1,30 @@
-# Getting Started with Create React App
+# Tokyo-neighborhood
+## Geospatial assessment
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+### Setup
 
-## Available Scripts
+```
+npm install
+npm start
+```
 
-In the project directory, you can run:
+### Libraries and tech used
 
-### `yarn start`
+* create-react-app
+* mapboxgl
+* mapbox-gl-draw
+* react-chart.js
+* turf.js
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Answers to tasks
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+1. The web app utilizes MapboxGL and React. The boundary of the map is Chiyoda neighborhood, Tokyo. User can use drawing tool to draw a polygon to select an area. Bounding box from this polygon would be created and used to query OSM features through Overpass API (buildings polygon and amenities points). The results are processed to display some buildings-related overview of the selected area.
 
-### `yarn test`
+2. From my personal experience, the performance of spatial data is best stored in PostgreSQL database, which could be hosted on AWS RDS as an example. If the daily amount of data is large like bus history or sattelite images, the better place to store these data is AWS D3. However, the indexing and performance in manipulating directly from this source is not as good as PostgreSQL. 
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Depending on the type of data storing and frequency of source update, the update of data in the cloud would be performed. With entire country related data, the data should be updated quarterly or at least annually. 
+One large things to consider when doing automation of updating country data from offical source is that the format of files, APIs, structures of pages would be changed, that causes complications in running scheduled scrips. Licenses of data source, data format, size of data and request speed are some of other things to consider as well.
 
-### `yarn build`
+3. I added a donut chart to show statistics of all point-of-interests in selected area.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+4. The queried building results were also reused to displayed queried buildings polygon, more info of the property can be seen by clicking on the building. User might wonder which buildings are selected, where they are and how they look like on the map. It is useful to see the highlight of buildings in selected area and some of their details, good for user interaction :) .
