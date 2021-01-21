@@ -1,0 +1,23 @@
+{
+  "files": {
+    "main.css": "/tokyo-neighborhood/static/css/main.5eefcaec.chunk.css",
+    "main.js": "/tokyo-neighborhood/static/js/main.711675d6.chunk.js",
+    "main.js.map": "/tokyo-neighborhood/static/js/main.711675d6.chunk.js.map",
+    "runtime-main.js": "/tokyo-neighborhood/static/js/runtime-main.352dd315.js",
+    "runtime-main.js.map": "/tokyo-neighborhood/static/js/runtime-main.352dd315.js.map",
+    "static/css/2.f3581edc.chunk.css": "/tokyo-neighborhood/static/css/2.f3581edc.chunk.css",
+    "static/js/2.1e131ccc.chunk.js": "/tokyo-neighborhood/static/js/2.1e131ccc.chunk.js",
+    "static/js/2.1e131ccc.chunk.js.map": "/tokyo-neighborhood/static/js/2.1e131ccc.chunk.js.map",
+    "index.html": "/tokyo-neighborhood/index.html",
+    "static/css/2.f3581edc.chunk.css.map": "/tokyo-neighborhood/static/css/2.f3581edc.chunk.css.map",
+    "static/css/main.5eefcaec.chunk.css.map": "/tokyo-neighborhood/static/css/main.5eefcaec.chunk.css.map",
+    "static/js/2.1e131ccc.chunk.js.LICENSE.txt": "/tokyo-neighborhood/static/js/2.1e131ccc.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.352dd315.js",
+    "static/css/2.f3581edc.chunk.css",
+    "static/js/2.1e131ccc.chunk.js",
+    "static/css/main.5eefcaec.chunk.css",
+    "static/js/main.711675d6.chunk.js"
+  ]
+}
